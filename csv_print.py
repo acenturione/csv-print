@@ -3,7 +3,10 @@ Generate HTML reports from CSV data.
 """
 import glob
 import pandas as pd
+import time
 from jinja2 import Environment, FileSystemLoader
+
+start_time = time.time()
 
 
 def create_dataframe(path):
@@ -35,6 +38,7 @@ if __name__ == "__main__":
     ending_station = 6081 # Ending station of tunnel STA = 60+81
 
     df = create_dataframe('../csv-print/csv_data/')
+    df_length = len(df)
     df = df.sort_values('Distance', ascending=True)
 
     # parse the Date to convert to standard datetime
@@ -65,5 +69,9 @@ if __name__ == "__main__":
     template_vars = {"title": "Microtunnel Drive Data", "drive_data": (df_to_html) }
     html_out = template.render(template_vars)
     print_to_html(html_out)
+
+    print 'It took', round(time.time()-start_time, 2), 'seconds to run the scipt.'
+    print 'The script processed', df_length, 'rows of CSV data.'
+    print 'That\'s', df_length*22, 'variables!'
 
 
