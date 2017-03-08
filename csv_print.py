@@ -21,16 +21,22 @@ def create_dataframe(path):
     return df
 
 
-def print_to_html(html_output_object):
-    """Create html output file.
+def print_df_to_html(dataframe):
+    """Create templated html output file from dataframe.
     :param html_output_object: Rendered pandas dataframe to html from jinja2.
     :return: none
     """
 
-    f = open('html_out.html', 'w')
-    f.write(html_output_object)
-    f.close()
+    df_to_html = dataframe.to_html()
+    env = Environment(loader=FileSystemLoader('.'))
+    template = env.get_template("report.html")
+    template_vars = {"title": "Microtunnel Drive Data", "drive_data": (df_to_html)}
+    html_out = template.render(template_vars)
 
+    file_name = 'dataframe.html' # need to figure out how to automatically name files
+    f = open(file_name, 'w')
+    f.write(html_out)
+    f.close()
 
 if __name__ == "__main__":
 
@@ -63,12 +69,12 @@ if __name__ == "__main__":
     # Convert Data Frame to HTML template and render
     # send HTML out to write file method
 
-    df_to_html = df_time_station.to_html()
-    env = Environment(loader=FileSystemLoader('.'))
-    template = env.get_template("report.html")
-    template_vars = {"title": "Microtunnel Drive Data", "drive_data": (df_to_html) }
-    html_out = template.render(template_vars)
-    print_to_html(html_out)
+    # df_to_html = df_time_station.to_html()
+    # env = Environment(loader=FileSystemLoader('.'))
+    # template = env.get_template("report.html")
+    # template_vars = {"title": "Microtunnel Drive Data", "drive_data": (df_to_html) }
+    # html_out = template.render(template_vars)
+    # print_to_html(html_out)
 
     # Document performance of the script and data processing
     print 'It took', round(time.time()-start_time, 2), 'seconds to run the scipt.'
@@ -76,8 +82,10 @@ if __name__ == "__main__":
     print 'That\'s', df_length*22, 'variables!'
 
     # Group data by date and distance.
-    print df_time_station['Dist_ft'].groupby(df_time_station['Date']).describe()
-
+    df_min = df_time_station['Dist_ft'].groupby(df_time_station['Date']).min()
+    df_max = df_time_station['Dist_ft'].groupby(df_time_station['Date']).max()
+    df_combined = pd.concat([df_min, df_max], axis=1).reset_index()
+    print_df_to_html(df_combined)
 
 
 
