@@ -70,8 +70,14 @@ if __name__ == "__main__":
     html_out = template.render(template_vars)
     print_to_html(html_out)
 
+    # Document performance of the script and data processing
     print 'It took', round(time.time()-start_time, 2), 'seconds to run the scipt.'
     print 'The script processed', df_length, 'rows of CSV data.'
     print 'That\'s', df_length*22, 'variables!'
+
+    # Group data by date and distance.
+    print df_time_station['Dist_ft'].groupby(df_time_station['Date']).describe()
+
+
 
 
